@@ -1,9 +1,11 @@
 package com.example.exchangerates.ui
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -42,12 +44,12 @@ class ExchangeRatesFragment : Fragment() {
                     list.forEachIndexed { _index, exchangeRate ->
                         if (exchangeRate.currency == privatCurrance){
                             recyclerViewNBU.smoothScrollToPosition(_index)
-                          //  recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.background=Color.YELLOW.toDrawable()
+                            recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.background=
+                                Color.YELLOW.toDrawable()
                             return@forEachIndexed
                         }
                     }
                 }
-
         }
 
         adapterPrivatBank.stateRestorationPolicy =
@@ -57,7 +59,6 @@ class ExchangeRatesFragment : Fragment() {
         viewModel.exchangeRatesListPrivatBank.observe(viewLifecycleOwner) { list ->
             adapterPrivatBank.submitList(list)
         }
-
 
         binding.pickerDataNBU.setOnClickListener {
             startDialogPickerDateFragment(2)
