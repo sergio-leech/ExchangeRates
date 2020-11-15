@@ -1,24 +1,25 @@
 package com.example.exchangerates.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.example.exchangerates.MainActivity
 import com.example.exchangerates.R
 import com.example.exchangerates.adapter.ExchangeRatesAdapter
+import com.example.exchangerates.adapter.ExchangeRatesNBUAdapter
 import com.example.exchangerates.databinding.FragmentExchangeRatesBinding
-import com.example.exchangerates.model.ExchangeRate
 import com.example.exchangerates.view_model.ExchangeRatesViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ExchangeRatesFragment : Fragment() {
-    private val viewModel: ExchangeRatesViewModel  by viewModels()
+    private val viewModel: ExchangeRatesViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -26,17 +27,53 @@ class ExchangeRatesFragment : Fragment() {
         val binding = FragmentExchangeRatesBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        val adapter = ExchangeRatesAdapter()
-        adapter.stateRestorationPolicy =
+
+        val adapterNBU = ExchangeRatesNBUAdapter()
+        adapterNBU.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        val recyclerViewNBU = binding.nbuRecyclerView
+        recyclerViewNBU.adapter = adapterNBU
+        viewModel.exchangeRatesListNBU.observe(viewLifecycleOwner) { list ->
+            adapterNBU.submitList(list)
+        }
+
+        val adapterPrivatBank = ExchangeRatesAdapter{ privatCurrance->
+            viewModel.exchangeRatesListNBU.observe(viewLifecycleOwner) { list ->
+                    list.forEachIndexed { _index, exchangeRate ->
+                        if (exchangeRate.currency == privatCurrance){
+                            recyclerViewNBU.smoothScrollToPosition(_index)
+                          //  recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.background=Color.YELLOW.toDrawable()
+                            return@forEachIndexed
+                        }
+                    }
+                }
+
+        }
+
+        adapterPrivatBank.stateRestorationPolicy =
             RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         val recyclerView = binding.privatRecyclerView
-        recyclerView.adapter = adapter
-
-        viewModel.exchangeRatesList.observe(viewLifecycleOwner){list->
-            adapter.submitList(list)
+        recyclerView.adapter = adapterPrivatBank
+        viewModel.exchangeRatesListPrivatBank.observe(viewLifecycleOwner) { list ->
+            adapterPrivatBank.submitList(list)
         }
-       // adapter.submitList(list)
+
+
+        binding.pickerDataNBU.setOnClickListener {
+            startDialogPickerDateFragment(2)
+        }
+        binding.pickerData.setOnClickListener {
+            startDialogPickerDateFragment(1)
+        }
+
         return binding.root
     }
+
+    private fun startDialogPickerDateFragment(key: Int) {
+        val bundle = bundleOf("key" to key)
+        (activity as MainActivity).navController.navigate(
+            R.id.action_exchangeRatesFragment_to_datePickerFragment,
+            bundle
+        )
+    }
 }
-//val list = listOf<ExchangeRate>(ExchangeRate("UIO","9.005",9.005,9.909,5.005,9.90),ExchangeRate("UIO","9.005",9.005,9.909,5.005,9.90))

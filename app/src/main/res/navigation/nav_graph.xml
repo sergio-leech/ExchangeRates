@@ -9,5 +9,18 @@
         android:id="@+id/exchangeRatesFragment"
         android:name="com.example.exchangerates.ui.ExchangeRatesFragment"
         android:label="fragment_exchange_rates"
-        tools:layout="@layout/fragment_exchange_rates" />
+        tools:layout="@layout/fragment_exchange_rates" >
+        <action
+            android:id="@+id/action_exchangeRatesFragment_to_datePickerFragment"
+            app:destination="@id/datePickerFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/datePickerFragment"
+        android:name="com.example.exchangerates.ui.DatePickerFragment"
+        android:label="fragment_date_picker"
+        tools:layout="@layout/fragment_date_picker" >
+        <action
+            android:id="@+id/action_datePickerFragment_to_exchangeRatesFragment"
+            app:destination="@id/exchangeRatesFragment" />
+    </dialog>
 </navigation>

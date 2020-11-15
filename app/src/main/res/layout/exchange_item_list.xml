@@ -4,47 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="clickListener"
+            type="android.view.View.OnClickListener" />
         <variable
             name="exchangeRate"
             type="com.example.exchangerates.model.ExchangeRate" />
     </data>
 
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:onClick="@{clickListener}"
+    android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="3">
 
         <TextView
             android:id="@+id/currency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:gravity="start"
             android:text="@{exchangeRate.currency}"
-            android:textSize="30sp"
+            android:textSize="25sp"
             tools:text="EUR" />
 
         <TextView
             android:id="@+id/saleRate"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textSize="30sp"
-            app:setSum="@{exchangeRate.saleRate}"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:textSize="25sp"
+            app:setSum="@{exchangeRate.purchaseRate}"
             tools:text="26.002" />
 
         <TextView
             android:id="@+id/purchaseRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textSize="30sp"
-            app:setSum="@{exchangeRate.purchaseRate}"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+           android:gravity="start"
+            android:textSize="25sp"
+            app:setSum="@{exchangeRate.saleRate}"
             tools:text="26.002" />
 
     </LinearLayout>
+    <View
+        android:layout_width="wrap_content"
+        android:background="@drawable/separator"
+        android:layout_height="1dp" />
+</LinearLayout>
 
 </layout>

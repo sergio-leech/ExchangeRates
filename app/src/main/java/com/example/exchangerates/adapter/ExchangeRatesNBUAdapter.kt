@@ -5,16 +5,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.exchangerates.databinding.ExchangeItemListBinding
+import com.example.exchangerates.databinding.ExchangeItemListNbuBinding
 import com.example.exchangerates.model.ExchangeRate
-import kotlinx.android.synthetic.main.exchange_item_list.view.*
 
-open class ExchangeRatesAdapter(val itemClick: (String) -> Unit) :
-    ListAdapter<ExchangeRate, ExchangeRatesAdapter.ExchangeRatesViewHolder>(DiffCallback) {
+class ExchangeRatesNBUAdapter :
+    ListAdapter<ExchangeRate, ExchangeRatesNBUAdapter.ExchangeRatesNBUViewHolder>(DiffCallback) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExchangeRatesViewHolder {
-        return ExchangeRatesViewHolder(
-            ExchangeItemListBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExchangeRatesNBUViewHolder {
+        return ExchangeRatesNBUViewHolder(
+            ExchangeItemListNbuBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -22,20 +21,14 @@ open class ExchangeRatesAdapter(val itemClick: (String) -> Unit) :
         )
     }
 
-    override fun onBindViewHolder(holder: ExchangeRatesViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ExchangeRatesNBUViewHolder, position: Int) {
         getItem(position)?.let { exchange ->
             holder.bind(exchange)
         }
     }
 
-    inner class ExchangeRatesViewHolder(private val binding: ExchangeItemListBinding) :
+    class ExchangeRatesNBUViewHolder(private val binding: ExchangeItemListNbuBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
-        init {
-            binding.setClickListener {
-                itemClick(it.currency.text.toString())
-            }
-        }
 
         fun bind(exchangeRateItem: ExchangeRate) {
             binding.apply {
@@ -51,7 +44,7 @@ open class ExchangeRatesAdapter(val itemClick: (String) -> Unit) :
         }
 
         override fun areContentsTheSame(oldItem: ExchangeRate, newItem: ExchangeRate): Boolean {
-            return oldItem.purchaseRate == newItem.purchaseRate
+            return oldItem.purchaseRateNB == newItem.purchaseRateNB
         }
     }
 }
