@@ -34,6 +34,7 @@ open class ExchangeRatesAdapter(val itemClick: (String) -> Unit) :
         init {
             binding.setClickListener {
                 itemClick(it.currency.text.toString())
+
             }
         }
 

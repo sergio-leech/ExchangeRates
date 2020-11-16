@@ -2,6 +2,8 @@ package com.example.exchangerates.ui
 
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ExchangeRatesFragment : Fragment() {
     private val viewModel: ExchangeRatesViewModel by viewModels()
-    var index:Int? = null
+    var index: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,21 +42,25 @@ class ExchangeRatesFragment : Fragment() {
             adapterNBU.submitList(list)
         }
 
-        val adapterPrivatBank = ExchangeRatesAdapter{ privatCurrance->
-           index?.let {recyclerViewNBU.findViewHolderForAdapterPosition(it)?.itemView?.background=
-                Color.WHITE.toDrawable()}
+        val adapterPrivatBank = ExchangeRatesAdapter { privatCurrance ->
+            index?.let {
+                recyclerViewNBU.findViewHolderForAdapterPosition(it)?.itemView?.background =
+                    Color.WHITE.toDrawable()
+            }
             viewModel.exchangeRatesListNBU.observe(viewLifecycleOwner) { list ->
-                    list.forEachIndexed { _index, exchangeRate ->
-                        if (exchangeRate.currency == privatCurrance){
-                            index = _index
-                            recyclerViewNBU.smoothScrollToPosition(_index)
-                            recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.background=
-                                Color.YELLOW.toDrawable()
-                            return@forEachIndexed
-                        }
+                list.forEachIndexed { _index, exchangeRate ->
+                    if (exchangeRate.currency == privatCurrance) {
+                        index = _index
+                        recyclerViewNBU.smoothScrollToPosition(_index)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.setBackgroundResource(
+                                R.color.teal_200
+                            )
+                        }, 30)
+                        return@forEachIndexed
                     }
                 }
-
+            }
         }
 
         adapterPrivatBank.stateRestorationPolicy =
@@ -64,7 +70,6 @@ class ExchangeRatesFragment : Fragment() {
         viewModel.exchangeRatesListPrivatBank.observe(viewLifecycleOwner) { list ->
             adapterPrivatBank.submitList(list)
         }
-
 
         binding.pickerDataNBU.setOnClickListener {
             startDialogPickerDateFragment(2)
