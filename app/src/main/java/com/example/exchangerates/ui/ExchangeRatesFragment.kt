@@ -1,9 +1,11 @@
 package com.example.exchangerates.ui
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ExchangeRatesFragment : Fragment() {
     private val viewModel: ExchangeRatesViewModel by viewModels()
+    var index:Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,11 +41,15 @@ class ExchangeRatesFragment : Fragment() {
         }
 
         val adapterPrivatBank = ExchangeRatesAdapter{ privatCurrance->
+           index?.let {recyclerViewNBU.findViewHolderForAdapterPosition(it)?.itemView?.background=
+                Color.WHITE.toDrawable()}
             viewModel.exchangeRatesListNBU.observe(viewLifecycleOwner) { list ->
                     list.forEachIndexed { _index, exchangeRate ->
                         if (exchangeRate.currency == privatCurrance){
+                            index = _index
                             recyclerViewNBU.smoothScrollToPosition(_index)
-                          //  recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.background=Color.YELLOW.toDrawable()
+                            recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.background=
+                                Color.YELLOW.toDrawable()
                             return@forEachIndexed
                         }
                     }
