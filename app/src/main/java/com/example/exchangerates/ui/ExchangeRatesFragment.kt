@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ExchangeRatesFragment : Fragment() {
     private val viewModel: ExchangeRatesViewModel by viewModels()
+    var index:Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,9 +41,12 @@ class ExchangeRatesFragment : Fragment() {
         }
 
         val adapterPrivatBank = ExchangeRatesAdapter{ privatCurrance->
+           index?.let {recyclerViewNBU.findViewHolderForAdapterPosition(it)?.itemView?.background=
+                Color.WHITE.toDrawable()}
             viewModel.exchangeRatesListNBU.observe(viewLifecycleOwner) { list ->
                     list.forEachIndexed { _index, exchangeRate ->
                         if (exchangeRate.currency == privatCurrance){
+                            index = _index
                             recyclerViewNBU.smoothScrollToPosition(_index)
                             recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.background=
                                 Color.YELLOW.toDrawable()
