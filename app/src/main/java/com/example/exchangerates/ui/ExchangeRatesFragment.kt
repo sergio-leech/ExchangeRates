@@ -53,10 +53,13 @@ class ExchangeRatesFragment : Fragment() {
                         index = _index
                         recyclerViewNBU.smoothScrollToPosition(_index)
                         Handler(Looper.getMainLooper()).postDelayed({
-                            recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.setBackgroundResource(
-                                R.color.teal_200
-                            )
-                        }, 30)
+                            val visible =recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.visibility
+                            if (visible == 0){
+                                recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.setBackgroundResource(
+                                    R.color.teal_200
+                                )
+                            }
+                        }, 40)
                         return@forEachIndexed
                     }
                 }

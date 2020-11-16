@@ -7,7 +7,9 @@ import com.example.exchangerates.api.PrivatBankService
 import com.example.exchangerates.model.ExchangeRate
 import com.example.exchangerates.shared_preferences.Keys
 import com.example.exchangerates.shared_preferences.SharedPreferencesUtil
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ExchangeRatesViewModel @ViewModelInject constructor(
@@ -44,7 +46,7 @@ class ExchangeRatesViewModel @ViewModelInject constructor(
     }
 
     private fun getListResult() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (datePrivat != sharedPreferencesUtil.getDate(Keys.datePrivatKey)) {
                     datePrivat?.let {
@@ -57,10 +59,9 @@ class ExchangeRatesViewModel @ViewModelInject constructor(
                     }
                     val exchangeRatesPrivat = listPrivat.await()
                     val exchangeRatePrivat = exchangeRatesPrivat.await().exchangeRate
-                    _exchangeRatesListPrivatBank.value =
-                        exchangeRatePrivat.filter { exchangeRate -> exchangeRate.saleRate != 0.00000 }
+                    _exchangeRatesListPrivatBank.postValue(
+                        exchangeRatePrivat.filter { exchangeRate -> exchangeRate.saleRate != 0.00000 })
                 }
-
                 if (dateNBU != sharedPreferencesUtil.getDate(Keys.dateNbyKey)) {
                     dateNBU?.let {
                         sharedPreferencesUtil.saveDate(Keys.dateNbyKey, it)
@@ -72,8 +73,8 @@ class ExchangeRatesViewModel @ViewModelInject constructor(
                     }
                     val exchangeRatesNbu = listNbu.await()
                     val exchangeRateNbu = exchangeRatesNbu.await().exchangeRate
-                    _exchangeRatesListNBU.value =
-                        exchangeRateNbu.filter { exchangeRate -> exchangeRate.currency != null }
+                    _exchangeRatesListNBU.postValue(
+                        exchangeRateNbu.filter { exchangeRate -> exchangeRate.currency != null })
                 }
 
             } catch (e: Exception) {
