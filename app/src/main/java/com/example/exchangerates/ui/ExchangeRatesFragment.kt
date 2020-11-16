@@ -56,7 +56,7 @@ class ExchangeRatesFragment : Fragment() {
                             recyclerViewNBU.findViewHolderForAdapterPosition(_index)?.itemView?.setBackgroundResource(
                                 R.color.teal_200
                             )
-                        }, 30)
+                        }, 40)
                         return@forEachIndexed
                     }
                 }
