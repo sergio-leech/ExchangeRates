@@ -62,6 +62,7 @@ class ExchangeRatesViewModel @ViewModelInject constructor(
                     _exchangeRatesListPrivatBank.postValue(
                         exchangeRatePrivat.filter { exchangeRate -> exchangeRate.saleRate != 0.00000 })
                 }
+                delay(1500)
                 if (dateNBU != sharedPreferencesUtil.getDate(Keys.dateNbyKey)) {
                     dateNBU?.let {
                         sharedPreferencesUtil.saveDate(Keys.dateNbyKey, it)
