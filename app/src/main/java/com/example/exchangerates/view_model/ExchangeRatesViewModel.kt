@@ -11,6 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class ExchangeRatesViewModel @ViewModelInject constructor(
     private val privatBankService: PrivatBankService,
@@ -34,6 +36,7 @@ class ExchangeRatesViewModel @ViewModelInject constructor(
 
     private val _exchangeRatesListNBU = MutableLiveData<List<ExchangeRate>>()
     val exchangeRatesListNBU: LiveData<List<ExchangeRate>> = _exchangeRatesListNBU
+    val mutex = Mutex()
 
     init {
         getListResult()
@@ -47,40 +50,25 @@ class ExchangeRatesViewModel @ViewModelInject constructor(
 
     private fun getListResult() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (datePrivat != sharedPreferencesUtil.getDate(Keys.datePrivatKey)) {
-                    datePrivat?.let {
-                        sharedPreferencesUtil.saveDate(Keys.datePrivatKey, it)
-                    }
-                    val listPrivat = async {
-                        privatBankService.getExchangeRatesListAsync(
-                            datePrivat ?: sharedPreferencesUtil.getDate(Keys.datePrivatKey)
-                        )
-                    }
-                    val exchangeRatesPrivat = listPrivat.await()
-                    val exchangeRatePrivat = exchangeRatesPrivat.await().exchangeRate
-                    _exchangeRatesListPrivatBank.postValue(
-                        exchangeRatePrivat.filter { exchangeRate -> exchangeRate.saleRate != 0.00000 })
-                }
-                delay(1500)
-                if (dateNBU != sharedPreferencesUtil.getDate(Keys.dateNbyKey)) {
-                    dateNBU?.let {
-                        sharedPreferencesUtil.saveDate(Keys.dateNbyKey, it)
-                    }
-                    val listNbu = async {
-                        privatBankService.getExchangeRatesListAsync(
-                            dateNBU ?: sharedPreferencesUtil.getDate(Keys.dateNbyKey)
-                        )
-                    }
-                    val exchangeRatesNbu = listNbu.await()
-                    val exchangeRateNbu = exchangeRatesNbu.await().exchangeRate
-                    _exchangeRatesListNBU.postValue(
-                        exchangeRateNbu.filter { exchangeRate -> exchangeRate.currency != null })
-                }
-
-            } catch (e: Exception) {
-                e.message
+            mutex.withLock {
+                _exchangeRatesListPrivatBank.postValue(
+                    getExchangeRateList(
+                        datePrivat ?: sharedPreferencesUtil.getDate(Keys.datePrivatKey)
+                    ).filter { exchangeRate -> exchangeRate.saleRate != 0.00000 })
+                _exchangeRatesListNBU.postValue(
+                    getExchangeRateList(
+                        dateNBU ?: sharedPreferencesUtil.getDate(Keys.dateNbyKey)
+                    ).filter { exchangeRate -> exchangeRate.currency != null })
             }
+        }
+    }
+
+    private suspend fun getExchangeRateList(date: String): List<ExchangeRate> {
+        return try {
+            privatBankService.getExchangeRatesListAsync(date).await().exchangeRate
+        } catch (e: Exception) {
+            e.message
+            listOf()
         }
     }
 }
